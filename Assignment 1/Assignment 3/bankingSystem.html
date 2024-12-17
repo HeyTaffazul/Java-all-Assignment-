@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Banking System</h1>
+        <div class="form-group">
+            <label for="depositAmount">Deposit Amount</label>
+            <input type="number" id="depositAmount" placeholder="Enter amount to deposit">
+            <button onclick="deposit()">Deposit</button>
+        </div>
+        <div class="form-group">
+            <label for="withdrawAmount">Withdraw Amount</label>
+            <input type="number" id="withdrawAmount" placeholder="Enter amount to withdraw">
+            <button onclick="withdraw()">Withdraw</button>
+        </div>
+        <div class="form-group">
+            <button onclick="checkBalance()">Check Balance</button>
+        </div>
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        async function deposit() {
+            const amount = document.getElementById("depositAmount").value;
+            if (amount === "") {
+                displayMessage("Please enter a deposit amount.");
+                return;
+            }
+            try {
+                const response = await fetch("/bank/deposit", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: parseFloat(amount) }),
+                });
+                const result = await response.json();
+                displayMessage(result.message);
+            } catch (error) {
+                displayMessage("Error: Unable to process deposit.");
+            }
+        }
+
+        async function withdraw() {
+            const amount = document.getElementById("withdrawAmount").value;
+            if (amount === "") {
+                displayMessage("Please enter a withdrawal amount.");
+                return;
+            }
+            try {
+                const response = await fetch("/bank/withdraw", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ amount: parseFloat(amount) }),
+                });
+                const result = await response.json();
+                displayMessage(result.message);
+            } catch (error) {
+                displayMessage("Error: Unable to process withdrawal.");
+            }
+        }
+
+        async function checkBalance() {
+            try {
+                const response = await fetch("/bank/balance");
+                const result = await response.json();
+                displayMessage(`Current Balance: ${result.balance}`);
+            } catch (error) {
+                displayMessage("Error: Unable to fetch balance.");
+            }
+        }
+
+        function displayMessage(message) {
+            const output = document.getElementById("output");
+            output.textContent = message;
+        }
+    </script>
+</body>
+</html>
